@@ -8,3 +8,13 @@
   margin: 2%;
   background-color: #cedebd;
 }
+
+.home-btn {
+  width: 80px;
+}
+
+@media screen and (max-width: 768px) {
+  .home-btn {
+    width: 20vw;
+  }
+}
