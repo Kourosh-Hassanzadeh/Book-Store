@@ -6,3 +6,24 @@
 .up-text {
   color: #435334;
 }
+
+.up-input {
+  border-radius: 0.5rem;
+  border: #435334 solid 1px;
+  width: 20vw;
+}
+
+.up-submit {
+  background-color: #9eb384;
+}
+
+.up-tArea {
+  height: 100px;
+}
+
+@media screen and (max-width: 768px) {
+    .up-input{
+        width: 50vw;
+    }
+}
+

@@ -42,10 +42,10 @@ const UpdateBook = () => {
     }
   };
   return (
-    <section className="up-bg">
+    <section className="container-fluid up-bg">
       <div className="row justify-content-center pt-4">
         <h3 className="up-text">
-          Update "<b>{book.name}</b>"{" "}
+          Update "<b>{book.name}</b>"
         </h3>
       </div>
       <div className="row justify-content-center">
@@ -60,7 +60,7 @@ const UpdateBook = () => {
             id="name"
             placeholder="name"
             value={formData.name}
-            className="add-input"
+            className="up-input"
             onChange={handleChange}
           />
           <br />
@@ -71,7 +71,7 @@ const UpdateBook = () => {
           <br />
 
           <textarea
-            className="add-input add-tArea"
+            className="up-input up-tArea"
             name="description"
             id="description"
             cols="30"
@@ -92,7 +92,7 @@ const UpdateBook = () => {
             id="author"
             placeholder="author"
             value={formData.author}
-            className="add-input"
+            className="up-input"
             onChange={handleChange}
           />
           <br />
@@ -106,13 +106,13 @@ const UpdateBook = () => {
             name="publish_date"
             id="publish_date"
             value={formData.publish_date}
-            className="add-input"
+            className="up-input"
             onChange={handleChange}
           />
           <br />
           <div className="text-center mt-4">
             <button
-              className="btn add-submit"
+              className="btn up-submit"
               type="button"
               onClick={handleUpdate}
             >
