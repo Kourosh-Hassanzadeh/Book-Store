@@ -3,6 +3,7 @@ from flask_restful import Resource, Api, fields, reqparse, marshal_with, abort
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 from flask_cors import CORS
+from sqlalchemy import desc
 
 app = Flask(__name__)
 api = Api(app)
@@ -101,13 +102,11 @@ class Book(Resource):
 class CreateBook(Resource):
     @marshal_with(resource_fields)
     def post(self):
-        # existBook = BookModel.query.filter_by(id=book_id).first()
-        # if existBook:
-        #     abort(409, description='Book with this id has already exists.')
-        count = BookModel.query.count()
+        count = BookModel.query.order_by(desc(BookModel.id)).first()
+        if count:
+            last = count.id
         args = book_post_arg.parse_args()
-        print(count)
-        book = BookModel(id=count+1, name=args["name"], description=args["description"],
+        book = BookModel(id=last+1, name=args["name"], description=args["description"],
                          author=args["author"], publish_date=args["publish_date"])
         db.session.add(book)
         db.session.commit()
