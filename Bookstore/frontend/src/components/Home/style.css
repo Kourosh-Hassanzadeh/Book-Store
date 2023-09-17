@@ -1,0 +1,10 @@
+.home-main {
+  min-height: 100vh;
+  background-color: #faf1e4;
+}
+
+.home-book {
+  width: 60vw;
+  margin: 2%;
+  background-color: #cedebd;
+}

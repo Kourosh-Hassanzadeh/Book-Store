@@ -1,0 +1,29 @@
+.add-bg {
+  min-height: 91vh;
+  background-color: #faf1e4;
+}
+
+.text-color {
+  color: #435334;
+  margin-top: 10px;
+}
+
+.add-input {
+  border-radius: 0.5rem;
+  border: #435334 solid 1px;
+  width: 20vw;
+}
+
+.add-submit {
+  background-color: #9eb384;
+}
+
+.add-tArea {
+  height: 100px;
+}
+
+@media screen and (max-width: 768px) {
+    .add-input{
+        width: 50vw;
+    }
+}

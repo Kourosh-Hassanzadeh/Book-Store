@@ -1,0 +1,14 @@
+.pagination {
+    display: flex;
+    justify-content: center;
+    list-style: none;
+  }
+  
+  .page-item {
+    margin: 0 5px; /* Adjust spacing between page items */
+  }
+  
+  .active {
+    background-color: #007bff; /* Change the background color of the active page item */
+    color: #fff; /* Change text color of the active page item */
+  }
