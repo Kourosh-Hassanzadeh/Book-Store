@@ -13,7 +13,6 @@ const AddBook = () => {
   });
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(formData);
     try {
       const response = await axios.post(
         "http://127.0.0.1:5000/createBook",
@@ -110,8 +109,8 @@ const AddBook = () => {
             <div className="text-center mt-4">
               <button
                 className="btn add-submit"
-                type="submit"
-                onSubmit={handleSubmit}
+                type="button"
+                onClick={handleSubmit}
               >
                 Submit
               </button>
