@@ -14,12 +14,11 @@ const AddBook = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post(
+      await axios.post(
         "http://127.0.0.1:5000/createBook",
         JSON.stringify(formData),
         { headers: { "Content-Type": "application/json" } }
       );
-      console.log(response.data);
       setFormData({ name: "", description: "", author: "", publish_date: "" });
     } catch (err) {
       console.log(err);

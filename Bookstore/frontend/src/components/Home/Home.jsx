@@ -17,9 +17,13 @@ const Home = () => {
         console.error("error", err);
       });
   }, []);
-  console.log(books);
+
   const NavigateToDelete = (book) => {
-    navigate(`/deleteBook/${book.id}`, book.id);
+    navigate(`/deleteBook/${book.id}`);
+  };
+
+  const navigateToUpdate = (book) => {
+    navigate(`/updateBook/${book.id}`, { state: { book } });
   };
   return (
     <section>
@@ -42,7 +46,10 @@ const Home = () => {
                 >
                   Delete
                 </button>
-                <button className="btn btn-warning home-btn ml-auto mr-2">
+                <button
+                  className="btn btn-warning home-btn ml-auto mr-2"
+                  onClick={() => navigateToUpdate(book)}
+                >
                   Update
                 </button>
               </div>
