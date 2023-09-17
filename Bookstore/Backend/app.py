@@ -52,7 +52,7 @@ class Books(Resource):
         books = BookModel.query.all()
         allBooks = {}
         for book in books:
-            allBooks[book.id] = {"name": book.name, "description": book.description,
+            allBooks[book.id] = {"id": book.id, "name": book.name, "description": book.description,
                                  "author": book.author, "publish_date": book.publish_date.isoformat()}
         return allBooks
 
@@ -96,7 +96,8 @@ class Book(Resource):
         db.session.delete(book)
         db.session.commit()
         return "Book Deleted", 204
-    
+
+
 class CreateBook(Resource):
     @marshal_with(resource_fields)
     def post(self):
@@ -107,7 +108,7 @@ class CreateBook(Resource):
         args = book_post_arg.parse_args()
         print(count)
         book = BookModel(id=count+1, name=args["name"], description=args["description"],
-                        author=args["author"], publish_date=args["publish_date"])
+                         author=args["author"], publish_date=args["publish_date"])
         db.session.add(book)
         db.session.commit()
         return book, 201
@@ -116,7 +117,6 @@ class CreateBook(Resource):
 api.add_resource(Books, "/books")
 api.add_resource(Book, "/book/<int:book_id>")
 api.add_resource(CreateBook, "/createBook")
-
 
 
 if __name__ == '__main__':
