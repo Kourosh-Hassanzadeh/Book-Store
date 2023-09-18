@@ -1,0 +1,37 @@
+.reg-bg {
+  min-height: 91vh;
+  background-color: #faf1e4;
+}
+
+.reg-text {
+  color: #435334;
+}
+
+.reg-input {
+  width: 20vw;
+  border: #435334 solid 1px;
+  border-radius: 0.5rem;
+}
+
+.reg-btn {
+  background-color: #9eb384;
+}
+
+.reg-link {
+  color: #435334;
+  text-decoration: none;
+}
+
+.reg-log {
+  color: #9eb384;
+}
+
+.reg-link:hover {
+  color: darkcyan;
+}
+
+@media screen and (max-width: 768px) {
+  .reg-input {
+    width: 50vw;
+  }
+}
