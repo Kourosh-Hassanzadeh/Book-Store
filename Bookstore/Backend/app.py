@@ -18,10 +18,13 @@ CORS(app, origins=["http://localhost:3000"])
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///sqlite.db'
 db = SQLAlchemy(app)
 
+valid_tokens = {}
+
 
 def generate_token(username):
     payload = {'username': username}
     token = jwt.encode(payload, jwt_secret, algorithm='HS256')
+    valid_tokens[username] = token
     return token
 
 
@@ -51,6 +54,7 @@ class BookModel(db.Model):
     description = db.Column(db.String(2000))
     author = db.Column(db.String(200))
     publish_date = db.Column(db.DateTime(timezone=True))
+    # user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
 
 
 class UserModel(db.Model):
@@ -58,6 +62,7 @@ class UserModel(db.Model):
     username = db.Column(db.String(200), unique=True)
     email = db.Column(db.String(200))
     password = db.Column(db.String(200))
+    # books = db.relationship('BookModel', backref='author', lazy=True)
 
 
 user_field = {
@@ -80,6 +85,10 @@ login_fields = {
     "token": fields.String(),
     "username": fields.String(),
     "password": fields.String()
+}
+
+logout_fields = {
+    "username": fields.String()
 }
 
 # with app.app_context():
@@ -110,6 +119,9 @@ login_args.add_argument("username", type=str)
 login_args.add_argument("password", type=str)
 login_args.add_argument("message", type=str)
 login_args.add_argument("token", type=str)
+
+logout_args = reqparse.RequestParser()
+logout_args.add_argument("username", type=str)
 
 
 class Users(Resource):
@@ -146,6 +158,22 @@ class Login(Resource):
         return "login please", 401
 
 
+class Logout(Resource):
+    @marshal_with(logout_fields)
+    def post(self):
+
+        args = logout_args.parse_args()
+        username = args["username"]
+
+        # Check if the user has a valid token stored
+        if username in valid_tokens:
+            # Invalidate the token by removing it from the list of valid tokens
+            del valid_tokens[username]
+            return {'message': 'User logged out successfully'}, 200
+        else:
+            return {'message': 'User is already logged out'}, 200
+
+
 class Books(Resource):
     def get(self):
         books = BookModel.query.all()
@@ -175,6 +203,7 @@ class Book(Resource):
     @marshal_with(resource_fields)
     @token_required
     def put(self, book_id):
+
         book = BookModel.query.filter_by(id=book_id).first()
         if not book:
             abort(404, description='Book does not exists.')
@@ -235,6 +264,7 @@ api.add_resource(Users, "/users")
 api.add_resource(User, "/user/<int:user_id>")
 api.add_resource(Login, "/login")
 api.add_resource(CreateUser, "/createUser")
+api.add_resource(Logout, "/logout")
 
 
 if __name__ == '__main__':
