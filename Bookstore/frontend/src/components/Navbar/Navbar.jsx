@@ -6,11 +6,17 @@ import { CgLogOut } from "react-icons/cg";
 import { MdOutlinePostAdd } from "react-icons/md";
 import { AuthContext } from "../../context/AuthContext";
 import "./style.css";
+import axios from "axios";
 
 const Navbar = () => {
-  const { isLoggedIn, logout } = useContext(AuthContext);
+  const { isLoggedIn, user, logout } = useContext(AuthContext);
+
+  const headers = {
+    Authorization: `Bearer ${localStorage.getItem("token")}`,
+  };
 
   const handleLogout = () => {
+    axios.post("http://127.0.0.1:5000/logout", { headers });
     logout();
   };
   return (
