@@ -1,11 +1,22 @@
-import React, { createContext, useState } from "react";
+import axios from "axios";
+import React, { createContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [user, setUser] = useState(null);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+
+    if (token) {
+      const user = JSON.parse(atob(token.split(".")[1]));
+      setUser(user);
+    }
+  }, []);
 
   const login = () => {
     setIsLoggedIn(true);
@@ -13,12 +24,12 @@ export const AuthProvider = ({ children }) => {
 
   const logout = () => {
     setIsLoggedIn(false);
-    localStorage.removeItem("token");
     navigate("/");
+    localStorage.removeItem("token");
   };
 
   return (
-    <AuthContext.Provider value={{ isLoggedIn, login, logout }}>
+    <AuthContext.Provider value={{ isLoggedIn, user, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
