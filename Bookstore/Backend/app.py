@@ -1,19 +1,48 @@
-from flask import Flask
+from flask import Flask, request
 from flask_restful import Resource, Api, fields, reqparse, marshal_with, abort
-from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 from flask_cors import CORS
 from sqlalchemy import desc
 import uuid
+import jwt
+from functools import wraps
+
 
 app = Flask(__name__)
 api = Api(app)
 secretKey = uuid.uuid4().hex
+jwt_secret = secretKey
 CORS(app, origins=["http://localhost:3000"])
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///sqlite.db'
 db = SQLAlchemy(app)
+
+
+def generate_token(username):
+    payload = {'username': username}
+    token = jwt.encode(payload, jwt_secret, algorithm='HS256')
+    return token
+
+
+def token_required(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        token = request.headers.get('Authorization')
+
+        if not token:
+            return {'message': 'Token is missing'}, 401
+
+        try:
+            data = jwt.decode(token, jwt_secret, algorithms=['HS256'])
+            current_user = UserModel.query.filter_by(
+                username=data['username']).first()
+        except:
+            return {'message': 'Token is invalid'}, 401
+
+        return f(current_user, *args, **kwargs)
+
+    return decorated
 
 
 class BookModel(db.Model):
@@ -29,22 +58,6 @@ class UserModel(db.Model):
     username = db.Column(db.String(200), unique=True)
     email = db.Column(db.String(200))
     password = db.Column(db.String(200))
-
-    def get_reset_token(self, expires_sec=1800):
-        s = Serializer(app.config['SECRET_KEY'], expires_sec)
-        return s.dumps({'user_id': self.id}).decode('utf-8')
-
-    @staticmethod
-    def verify_reset_token(token):
-        s = Serializer(app.config['SECRET_KEY'])
-        try:
-            user_id = s.loads(token)['user_id']
-        except:
-            return None
-        return User.query.get(user_id)
-
-    def __repr__(self):
-        return f"User('{self.username}', '{self.email}')"
 
 
 user_field = {
@@ -63,8 +76,14 @@ resource_fields = {
     "publish_date": fields.DateTime()
 }
 
-with app.app_context():
-    db.create_all()
+login_fields = {
+    "token": fields.String(),
+    "username": fields.String(),
+    "password": fields.String()
+}
+
+# with app.app_context():
+#     db.create_all()
 
 book_post_arg = reqparse.RequestParser()
 book_post_arg.add_argument("name", type=str, required=True)
@@ -86,6 +105,12 @@ user_post_args.add_argument("username", type=str)
 user_post_args.add_argument("email", type=str)
 user_post_args.add_argument("password", type=str)
 
+login_args = reqparse.RequestParser()
+login_args.add_argument("username", type=str)
+login_args.add_argument("password", type=str)
+login_args.add_argument("message", type=str)
+login_args.add_argument("token", type=str)
+
 
 class Users(Resource):
     def get(self):
@@ -105,17 +130,20 @@ class User(Resource):
             abort(404, description="User does not exists.")
         return user
 
-    @marshal_with(user_field)
-    def post(self, user_id):
-        users = UserModel.query.filter_by(id=user_id).first()
-        if users:
-            abort(409, description="User Already exists")
-        args = user_post_args.parse_args()
-        user = UserModel(
-            id=user_id, username=args["username"], email=args["email"], password=args["password"])
-        db.session.add(user)
-        db.session.commit()
-        return user, 201
+
+class Login(Resource):
+    @marshal_with(login_fields)
+    def post(self):
+        args = login_args.parse_args()
+        arg_username = args["username"]
+        arg_password = args["password"]
+        user = UserModel.query.filter_by(
+            username=arg_username, password=arg_password).first()
+        if user:
+            token = generate_token(user.username)
+            return {'token': token, 'username': user.username, 'password': user.password}, 200
+
+        return "login please", 401
 
 
 class Books(Resource):
@@ -127,6 +155,7 @@ class Books(Resource):
                                  "author": book.author, "publish_date": book.publish_date.isoformat()}
         return allBooks
 
+    @token_required
     def delete(self):
         books = BookModel.query.all()
         for book in books:
@@ -144,6 +173,7 @@ class Book(Resource):
         return book
 
     @marshal_with(resource_fields)
+    @token_required
     def put(self, book_id):
         book = BookModel.query.filter_by(id=book_id).first()
         if not book:
@@ -160,6 +190,7 @@ class Book(Resource):
         db.session.commit()
         return book
 
+    @token_required
     def delete(self, book_id):
         book = BookModel.query.filter_by(id=book_id).first()
         if not book:
@@ -183,11 +214,27 @@ class CreateBook(Resource):
         return book, 201
 
 
+class CreateUser(Resource):
+    @marshal_with(user_field)
+    def post(self):
+        count = UserModel.query.order_by(desc(UserModel.id)).first()
+        if count:
+            last = count.id
+        args = user_post_args.parse_args()
+        user = UserModel(
+            id=last+1, username=args["username"], email=args["email"], password=args["password"])
+        db.session.add(user)
+        db.session.commit()
+        return user, 201
+
+
 api.add_resource(Books, "/books")
 api.add_resource(Book, "/book/<int:book_id>")
 api.add_resource(CreateBook, "/createBook")
 api.add_resource(Users, "/users")
 api.add_resource(User, "/user/<int:user_id>")
+api.add_resource(Login, "/login")
+api.add_resource(CreateUser, "/createUser")
 
 
 if __name__ == '__main__':
