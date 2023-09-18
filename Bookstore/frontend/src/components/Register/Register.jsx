@@ -10,7 +10,7 @@ const Register = () => {
     if (pass1 === pass2) {
       return true;
     } else {
-      return false;
+      alert("passwords does not match");
     }
   };
 
