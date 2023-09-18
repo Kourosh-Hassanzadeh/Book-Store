@@ -1,0 +1,37 @@
+.log-bg {
+  min-height: 91vh;
+  background-color: #faf1e4;
+}
+
+.log-text {
+  color: #435334;
+}
+
+.log-input {
+  width: 20vw;
+  border: #435334 solid 1px;
+  border-radius: 0.5rem;
+}
+
+.log-btn {
+  background-color: #9eb384;
+}
+
+.log-link {
+  color: #435334;
+  text-decoration: none;
+}
+
+.log-reg {
+  color: #9eb384;
+}
+
+.log-link:hover {
+  color: darkcyan;
+}
+
+@media screen and (max-width: 768px) {
+  .log-input {
+    width: 50vw;
+  }
+}
