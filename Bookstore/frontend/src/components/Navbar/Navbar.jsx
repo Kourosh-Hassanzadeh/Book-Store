@@ -34,12 +34,16 @@ const Navbar = () => {
               Home
             </NavLink>
           </li>
-          <MdOutlinePostAdd className="nav-icons" size={20} />
-          <li className="nav-item active mr-3">
-            <NavLink className="nav-link" to="/createBook">
-              Add New Book
-            </NavLink>
-          </li>
+          {isLoggedIn && (
+            <>
+              <MdOutlinePostAdd className="nav-icons" size={20} />
+              <li className="nav-item active mr-3">
+                <NavLink className="nav-link" to="/createBook">
+                  Add New Book
+                </NavLink>
+              </li>
+            </>
+          )}
         </ul>
         <ul className="navbar-nav ml-auto">
           {isLoggedIn ? (
