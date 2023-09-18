@@ -22,6 +22,9 @@ const Login = () => {
           localStorage.setItem("token", token);
           login();
           navigate("/");
+        })
+        .catch(() => {
+          alert("username or password is wrong");
         });
     } catch (err) {
       console.log(err);
