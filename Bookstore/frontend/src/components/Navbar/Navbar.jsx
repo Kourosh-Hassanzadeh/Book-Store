@@ -10,14 +10,32 @@ import axios from "axios";
 
 const Navbar = () => {
   const { isLoggedIn, user, logout } = useContext(AuthContext);
+  const username = user?.username
+  console.log(user)
 
-  const headers = {
-    Authorization: `Bearer ${localStorage.getItem("token")}`,
-  };
+  const token = localStorage.getItem("token");
 
   const handleLogout = () => {
-    axios.post("http://127.0.0.1:5000/logout", { headers });
-    logout();
+    try {
+      axios
+        .post(
+          "http://127.0.0.1:5000/logout",
+          { username, token },
+          {
+            headers: { "Content-Type": "application/json" },
+          }
+        )
+        .then((res) => {
+          if (res.status === 200) {
+            logout();
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    } catch (err) {
+      console.log(err);
+    }
   };
   return (
     <nav className="navbar navbar-expand-lg navbar-light navBg">

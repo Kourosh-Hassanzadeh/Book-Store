@@ -1,11 +1,13 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import "./style.css";
+import { AuthContext } from "../../context/AuthContext";
 
 const Home = () => {
   const [books, setBooks] = useState([]);
   const navigate = useNavigate();
+  const { isLoggedIn } = useContext(AuthContext);
   useEffect(() => {
     axios
       .get("http://127.0.0.1:5000/books")
@@ -39,20 +41,22 @@ const Home = () => {
                 <p className="card-text">{book.description}</p>
                 <pre className="card-text">{book.publish_date}</pre>
               </div>
-              <div className="row">
-                <button
-                  className="btn btn-danger ml-2 home-btn"
-                  onClick={() => NavigateToDelete(book)}
-                >
-                  Delete
-                </button>
-                <button
-                  className="btn btn-warning home-btn ml-auto mr-2"
-                  onClick={() => navigateToUpdate(book)}
-                >
-                  Update
-                </button>
-              </div>
+              {isLoggedIn && (
+                <div className="row justify-content-center">
+                  <button
+                    className="btn btn-danger ml-2 home-btn"
+                    onClick={() => NavigateToDelete(book)}
+                  >
+                    Delete
+                  </button>
+                  <button
+                    className="btn btn-warning home-btn ml-auto mr-2"
+                    onClick={() => navigateToUpdate(book)}
+                  >
+                    Update
+                  </button>
+                </div>
+              )}
             </div>
           ))}
         </div>
