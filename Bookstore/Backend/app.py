@@ -54,7 +54,6 @@ class BookModel(db.Model):
     description = db.Column(db.String(2000))
     author = db.Column(db.String(200))
     publish_date = db.Column(db.DateTime(timezone=True))
-    # user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
 
 
 class UserModel(db.Model):
@@ -62,7 +61,6 @@ class UserModel(db.Model):
     username = db.Column(db.String(200), unique=True)
     email = db.Column(db.String(200))
     password = db.Column(db.String(200))
-    # books = db.relationship('BookModel', backref='author', lazy=True)
 
 
 user_field = {
@@ -88,7 +86,8 @@ login_fields = {
 }
 
 logout_fields = {
-    "username": fields.String()
+    "username": fields.String(),
+    "token": fields.String()
 }
 
 # with app.app_context():
@@ -114,6 +113,7 @@ user_post_args.add_argument("username", type=str)
 user_post_args.add_argument("email", type=str)
 user_post_args.add_argument("password", type=str)
 
+
 login_args = reqparse.RequestParser()
 login_args.add_argument("username", type=str)
 login_args.add_argument("password", type=str)
@@ -122,6 +122,7 @@ login_args.add_argument("token", type=str)
 
 logout_args = reqparse.RequestParser()
 logout_args.add_argument("username", type=str)
+logout_args.add_argument("token", type=str)
 
 
 class Users(Resource):
@@ -143,6 +144,22 @@ class User(Resource):
         return user
 
 
+class Logout(Resource):
+    @marshal_with(logout_fields)
+    def post(self):
+        args = logout_args.parse_args()
+        user = args["username"]
+        userToken = args["token"]
+        data = {f'{user}': f'{userToken}'}
+
+        for userData in valid_tokens:
+            if data == valid_tokens:
+                del valid_tokens[userData]
+                return {'message': 'User logged out successfully'}, 200
+            else:
+                return {'message': 'User is already logged out'}, 200
+
+
 class Login(Resource):
     @marshal_with(login_fields)
     def post(self):
@@ -156,22 +173,6 @@ class Login(Resource):
             return {'token': token, 'username': user.username, 'password': user.password}, 200
 
         return "login please", 401
-
-
-class Logout(Resource):
-    @marshal_with(logout_fields)
-    def post(self):
-
-        args = logout_args.parse_args()
-        username = args["username"]
-
-        # Check if the user has a valid token stored
-        if username in valid_tokens:
-            # Invalidate the token by removing it from the list of valid tokens
-            del valid_tokens[username]
-            return {'message': 'User logged out successfully'}, 200
-        else:
-            return {'message': 'User is already logged out'}, 200
 
 
 class Books(Resource):
