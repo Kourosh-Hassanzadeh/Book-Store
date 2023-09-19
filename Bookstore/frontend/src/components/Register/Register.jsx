@@ -1,10 +1,12 @@
 import React, { useState } from "react";
 import axios from "axios";
 import "./style.css";
+import { useNavigate } from "react-router-dom";
 
 const Register = () => {
   const [data, setData] = useState({ username: "", email: "", password: "" });
   const [pass2, setPass] = useState("");
+  const navigate = useNavigate()
 
   const checkPasswords = (pass1) => {
     if (pass1 === pass2) {
@@ -23,7 +25,7 @@ const Register = () => {
             headers: { "Content-Type": "application/json" },
           })
           .then((res) => {
-            console.log(res);
+            navigate("/login")
           });
       } catch (err) {
         console.log(err);
