@@ -1,5 +1,4 @@
-import axios from "axios";
-import React, { createContext, useEffect, useState } from "react";
+import React, { createContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 export const AuthContext = createContext();
@@ -9,20 +8,22 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const navigate = useNavigate();
 
-  useEffect(() => {
+  const checkLogged = () => {
     const token = localStorage.getItem("token");
 
     if (token) {
       const user = JSON.parse(atob(token.split(".")[1]));
       setUser(user);
     }
-  }, []);
+  };
 
   const login = () => {
     setIsLoggedIn(true);
+    checkLogged()
   };
 
   const logout = () => {
+    setUser(null)
     setIsLoggedIn(false);
     navigate("/");
     localStorage.removeItem("token");
@@ -34,5 +35,3 @@ export const AuthProvider = ({ children }) => {
     </AuthContext.Provider>
   );
 };
-
-// export default AuthProvider;
